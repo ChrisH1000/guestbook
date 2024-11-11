@@ -4,19 +4,22 @@ import { db, GuestBook } from 'astro:db';
 // Watch for POST requests
 if(Astro.request.method === 'POST') {
 
-	// console.log(await Astro.request)
-
+	// Parse form data
 	let formData = await Astro.request.formData();
 	let author = formData.get('author');
 	let content = formData.get('content');
+	let special = formData.get('special');
 
-	// Validate that author and content are both of type 'string'
-	if (typeof author === 'string' && typeof content === 'string') {
+	// if special is falsy, proceed to validation
+	if(!special) {
+		// Validate that author and content are both of type 'string'
+		if (typeof author === 'string' && typeof content === 'string') {
 
-		// Insert data into the database
-		await db.insert(GuestBook).values({ author, content });
+			// Insert data into the database
+			await db.insert(GuestBook).values({ author, content });
 
-		return Astro.redirect('/');
+			return Astro.redirect('/');
+		}
 	}
 }
 
@@ -38,10 +41,14 @@ const guestBook = await db.select().from(GuestBook);
 	}
 </dl>
 
-<form method="POST" enctype="multipart/form-data">
+<form method="POST">
   <label for="author">
     Author
     <input id="author" name="author" />
+  </label>
+
+  <label for="special">
+    <input id="special" name="special" />
   </label>
 
   <label for="content">
